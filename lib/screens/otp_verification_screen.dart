@@ -21,23 +21,50 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   TextEditingController otpController = TextEditingController();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
+
+  void listenOTP() async{
+    //bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
+    bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
+    if(permissionsGranted!){
+      print("LISTENING TO OTP -----------------> 1");
+      telephony.listenIncomingSms(
+        listenInBackground: false,
+        onNewMessage: (message) {
+          print('${message.body} ---------------------> 2');
+          if (message.body!.contains('delivery-app-dc02c')) {
+            print('${message.body} ---------------------> 3');
+            setState(() {
+              otpController.text = message.body!.substring(0, 6);
+              print('${message.body} ---------------------> 4');
+            });
+          }
+        },
+      );
+    }else{
+      print('SMS read not granted ---------------------->');
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    //listenOTP();
+    listenOTP();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+    focusNode.dispose();
+    otpController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
+
 
     // TODO: implement build
     return Scaffold(
@@ -104,7 +131,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               InkWell(
                 onTap: () async {
                   try {
-                    listenOTP();
+                    //listenOTP();
                     PhoneAuthCredential credential;
                     credential = await PhoneAuthProvider.credential(
                         verificationId: widget.verificationId,
@@ -116,6 +143,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => HomeScreen()));
+                      print(userCred.credential);
                     }
                     print(credential.toString());
                   } catch (err) {
@@ -145,7 +173,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     );
   }
 
-  void listenOTP() {
+
+
+
+
+  /*void listenOTP() {
     print("LISTENING TO OTP ");
     telephony.listenIncomingSms(
       listenInBackground: false,
@@ -157,7 +189,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         }
       },
     );
-  }
+  }*/
 }
 
 class CustomText extends StatelessWidget {
@@ -175,66 +207,6 @@ class CustomText extends StatelessWidget {
           fontWeight: FontWeight.bold,
           fontSize: 16,
           color: isMobNo ? Colors.green : Colors.black),
-    );
-  }
-}
-
-class OtpBox extends StatelessWidget {
-  TextEditingController controller;
-
-  OtpBox(
-      {required this.controller,
-      this.nextNode,
-      required this.currentNode,
-      this.prevNode});
-
-  final FocusNode? nextNode;
-  final FocusNode currentNode;
-  final FocusNode? prevNode;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: Color(0xFFF2F2F2)),
-      width: 55,
-      height: 60,
-      child: TextField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        onChanged: (text) {
-          if (text.length == 1) {
-            //FocusScope.of(context).requestFocus(nextNode);
-            nextNode?.nextFocus();
-            //prevNode?.unfocus();
-          } else if (text.isEmpty && prevNode != null) {
-            //FocusScope.of(context).requestFocus(prevNode);
-            prevNode?.previousFocus();
-          } else if (text.isEmpty) {
-            //FocusScope.of(context).requestFocus(prevNode);
-            prevNode?.previousFocus();
-          }
-          // if (currentNode.hasPrimaryFocus) {
-          //   prevNode?.unfocus();
-          //   nextNode?.unfocus();
-          // }
-        },
-        focusNode: currentNode,
-        maxLength: 1,
-        textAlign: TextAlign.center,
-        decoration: InputDecoration(
-            counterText: '',
-            contentPadding: EdgeInsets.all(8),
-            border: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFFC6111), width: 2.5),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFFC6111), width: 2.5),
-              borderRadius: BorderRadius.circular(8),
-            )),
-        style: TextStyle(
-            fontSize: 28, color: Colors.green, fontWeight: FontWeight.bold),
-      ),
     );
   }
 }

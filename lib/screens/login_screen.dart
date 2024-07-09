@@ -97,17 +97,18 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: InkWell(
-                onTap: (){
+                onTap: () async{
                   if(phoneController.text.isNotEmpty){
+                    //bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
                     fAuth.verifyPhoneNumber(
                       phoneNumber: '+91${phoneController.text}',
                       verificationCompleted: (phoneAuthCredential) {
 
                       }, verificationFailed: (error) {
 
-                    }, codeSent: (verificationId, forceResendingToken) {
+                    }, codeSent: (verificationId, forceResendingToken) async{
                       otpVerificationId = verificationId;
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpVerificationScreen(mobNo: '+91${phoneController.text}', verificationId: otpVerificationId!)));
+                       Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpVerificationScreen(mobNo: '+91${phoneController.text}', verificationId: otpVerificationId!)));
 
                         }, codeAutoRetrievalTimeout: (verificationId) {
 
