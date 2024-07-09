@@ -106,12 +106,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       }, verificationFailed: (error) {
 
                     }, codeSent: (verificationId, forceResendingToken) {
-                        if(verificationId != null){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpVerificationScreen(mobNo: '+91${phoneController.text}', verificationId: otpVerificationId!)));
+                      otpVerificationId = verificationId;
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>OtpVerificationScreen(mobNo: '+91${phoneController.text}', verificationId: otpVerificationId!)));
 
-                        }
                         }, codeAutoRetrievalTimeout: (verificationId) {
 
+                      otpVerificationId = verificationId;
                     },
                     );
                   }

@@ -25,7 +25,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    listenOTP();
+    //listenOTP();
   }
 
   @override
@@ -104,6 +104,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               InkWell(
                 onTap: () async {
                   try {
+                    listenOTP();
                     PhoneAuthCredential credential;
                     credential = await PhoneAuthProvider.credential(
                         verificationId: widget.verificationId,
@@ -150,12 +151,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       listenInBackground: false,
       onNewMessage: (message) {
         if (message.body!.contains('delivery-app-dc02c')) {
-          String OTP = message.body!.substring(0, 6);
-
-          print(OTP);
-
           setState(() {
-            otpController.text = OTP;
+            otpController.text = message.body!.substring(0, 6);;
           });
         }
       },
